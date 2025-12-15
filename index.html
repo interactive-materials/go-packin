@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scanner App</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.4/howler.min.js"
+  crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+<script src="situations.js"></script>
+<script src="app.js" defer></script>
+</head>
+
+<body>
+  <div id="app"></div>
+
+  <script type="module">
+    // Import the functions you need from the SDKs you need
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
+    // TODO: Add SDKs for Firebase products that you want to use
+    // https://firebase.google.com/docs/web/setup#available-libraries
+
+    // Your web app's Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyBhRG7W6dAJsoDS2oiIIPrGAftI34OLyPM",
+      authDomain: "redcross-barcode-web.firebaseapp.com",
+      projectId: "redcross-barcode-web",
+      storageBucket: "redcross-barcode-web.firebasestorage.app",
+      messagingSenderId: "29231321142",
+      appId: "1:29231321142:web:2fa6431e20979f1bd3c897"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+  </script>
+</body>
+
+</html>

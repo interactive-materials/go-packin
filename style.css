@@ -1,0 +1,1310 @@
+@import url('https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700&display=swap');
+
+/* Dogica Pixel Font */
+@font-face {
+    font-family: "Dogica Pixel";
+    src: url('dogicapixel.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+/* Chunky Expand Animation */
+@keyframes chunkyExpand {
+    0% {
+        transform: scale(0);
+        opacity: 0;
+    }
+
+    25% {
+        transform: scale(0.5);
+        opacity: 1;
+    }
+
+    50% {
+        transform: scale(0.8);
+    }
+
+    75% {
+        transform: scale(1.1);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+:root {
+    --bg-color: #f0f2f5;
+    --card-bg: #ffffff;
+    --text-color: #333333;
+    --accent-color: #0ea5e9;
+    --accent-hover: #0284c7;
+    --border-color: #e2e8f0;
+    --success-color: #10b981;
+    --warning-color: #f59e0b;
+    --danger-color: #ef4444;
+    --Indigo: #2F3061;
+    --salmon-red: #fa8072;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #1e1e1e;
+    /* Dark background for the outside */
+    color: var(--text-color);
+    height: 100vh;
+    width: 100vw;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+#app {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* --- Background Classes --- */
+/* Common container styles */
+.app-container {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    background: transparent;
+    overflow: hidden;
+    z-index: 0;
+}
+
+/* Scrolling Background Layer */
+.bg-scrolling::before {
+    content: "";
+    position: absolute;
+    width: 200%;
+    height: 200%;
+    top: -50%;
+    left: -50%;
+    z-index: -1;
+    background-color: #58C4E5;
+    background-image: url('default background.png');
+    background-repeat: repeat;
+    background-position: var(--bg-x, 0px) var(--bg-y, 0px);
+
+    transform: rotate(45deg);
+    image-rendering: pixelated;
+    opacity: 1;
+    /* VALIDATED: Visible */
+    pointer-events: none;
+}
+
+/* Static Apartment Background */
+.bg-apartment {
+    background-image: url('apartmentbackground.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    image-rendering: pixelated;
+}
+
+/* Hide scrolling layer when apartment is active */
+.bg-apartment::before {
+    display: none;
+}
+
+/* Screen Transitions */
+.screen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 1;
+    transition: opacity 0.3s ease-in-out;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.screen.active {
+    opacity: 1;
+    pointer-events: all;
+    z-index: 10;
+}
+
+h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    color: #1e293b;
+    text-align: center;
+}
+
+p {
+    color: #64748b;
+    margin-bottom: 2rem;
+    text-align: center;
+    line-height: 1.6;
+    font-size: 1.1rem;
+    max-width: 800px;
+}
+
+/* Persistent Codes */
+.exit-code {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    width: 150px;
+    /* 1.5x bigger (was 100px in previous edit context or user request context) */
+    height: auto;
+    z-index: 100;
+    cursor: pointer;
+}
+
+.next-code {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 150px;
+    height: auto;
+    z-index: 100;
+    cursor: pointer;
+}
+
+/* Ensure next code is hidden in selection screen if needed via JS or specific CSS */
+.screen[id="selection-screen"]~.next-code {
+    display: none;
+}
+
+/* Forms & Inputs */
+.input-group {
+    width: 100%;
+    max-width: 600px;
+    margin-bottom: 2rem;
+}
+
+input[type="text"],
+input[type="number"],
+input[type="file"] {
+    width: 100%;
+    padding: 1rem 1.5rem;
+    background: #ffffff;
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    color: var(--text-color);
+    font-size: 1.2rem;
+    font-family: inherit;
+    transition: all 0.2s ease;
+    outline: none;
+    margin-bottom: 15px;
+}
+
+input:focus {
+    border-color: var(--accent-color);
+}
+
+/* Buttons */
+button {
+    background: var(--accent-color);
+    color: white;
+    border: none;
+    padding: 1rem 2rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+button:hover {
+    background: var(--accent-hover);
+}
+
+/* --- Selection Screen --- */
+.selection-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 40px;
+    width: 100%;
+    margin-top: 2rem;
+}
+
+.selection-img {
+    width: 250px;
+    /* Larger images for 16:9 desktop */
+    height: 250px;
+    object-fit: contain;
+    background: white;
+    padding: 20px;
+    border-radius: 16px;
+    cursor: pointer;
+    border: 3px solid transparent;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    transition: all 0.2s;
+}
+
+.selection-img:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    border-color: var(--accent-color);
+}
+
+/* --- Generic Text Box Style --- */
+.text-box-style {
+    background: white;
+    border: 6px solid #2F3061;
+    border-radius: 0;
+    color: #2F3061;
+    padding: 30px;
+    font-size: 1.5rem;
+    font-weight: 700;
+    box-shadow: 8px 8px 0 0 rgba(0, 0, 0, 0.25);
+    font-family: 'Inter', sans-serif;
+    position: relative;
+    /* For button positioning */
+}
+
+/* --- Intro Screen --- */
+.intro-container {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.panda-img {
+    position: absolute;
+    bottom: 5%;
+    right: 5%;
+    height: 65vh;
+    /* 4x bigger approx */
+    width: auto;
+    image-rendering: pixelated;
+    z-index: 10;
+}
+
+.intro-text-box {
+    position: relative;
+    z-index: 20;
+    max-width: 50%;
+    margin-right: 20%;
+    width: 500px;
+    height: 200px;
+    /* Fixed height to prevent growing */
+    /* overflow: hidden; Removed to allow outside button */
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    /* Horizontal Left */
+    text-align: left;
+    /* Left Text */
+    white-space: pre-wrap;
+    /* Enable \n newlines */
+    padding: 30px;
+    /* Padding explicitly */
+    position: relative;
+    /* For button positioning */
+    overflow: visible;
+    /* Allow button to hang outside */
+}
+
+/* --- Demo Screen --- */
+.demo-container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: row;
+    /* Side by side */
+    justify-content: center;
+    align-items: stretch;
+    /* Match height */
+    gap: 0;
+    /* No gap, attach if desired? User image shows attached? User said "tall as video", implies flush height. */
+    /* But standard layout often has gap. Image looks like they are side-by-side with blue borders touching? */
+    /* Let's keep gap 40px for now unless user implies touching. The image shows them separate but matching height. */
+    padding: 10% 15%;
+    /* Add padding to center them nicely */
+}
+
+.demo-video {
+    width: 25%;
+    /* Much smaller */
+    height: auto;
+    border: 6px solid #2F3061;
+    border-radius: 0;
+    order: 2;
+    /* Put to Right */
+}
+
+.demo-text-box {
+    flex: 1;
+    max-width: 50%;
+    text-align: left;
+    order: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    /* Center content vertically */
+    align-items: flex-start;
+    padding: 40px;
+    gap: 20px;
+}
+
+/* --- Settings Screen Scroll --- */
+/* Targeting the input group info box or the whole container if added specific class */
+.settings-scroll-container {
+    max-height: 80vh;
+    overflow-y: auto;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    /* Scrollbar styling optional */
+}
+
+/* --- Feedback Screen --- */
+.feedback-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 30px;
+    text-align: center;
+}
+
+.feedback-text {
+    display: flex;
+    width: 823px;
+    height: 547px;
+    padding: 50px;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: flex-end;
+    border: 8px solid #2F3061;
+    background: #FFF;
+    box-shadow: 8px 8px 0 0 rgba(0, 0, 0, 0.25);
+
+    animation: chunkyExpand 0.4s steps(8) forwards;
+    position: relative;
+    /* For button positioning */
+}
+
+.character-face {
+    width: 108px;
+    height: 80px;
+    align-self: flex-start;
+}
+
+.feedback-message {
+    flex: 1 0 0;
+    color: #2F3061;
+    font-family: "Nunito";
+    font-size: 30px;
+    font-weight: 500;
+    line-height: normal;
+    text-align: left;
+    width: 100%;
+}
+
+.feedback-image-box {
+    display: flex;
+    width: 407px;
+    height: 547px;
+    padding: 47px 73px;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    border: 9px solid #2F3061;
+    background: #FFF;
+    box-shadow: 8px 8px 0 0 rgba(0, 0, 0, 0.25);
+    animation: chunkyExpand 0.4s steps(8) forwards;
+}
+
+.feedback-image-box img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+/* --- Countdown Screen --- */
+.countdown-text {
+    color: #2F3061;
+    text-align: center;
+    font-family: "Pixelify Sans", cursive;
+    font-size: 200px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+    text-shadow:
+        -6px -6px 0 #FFF,
+        6px -6px 0 #FFF,
+        -6px 6px 0 #FFF,
+        6px 6px 0 #FFF,
+        0px -6px 0 #FFF,
+        0px 6px 0 #FFF,
+        -6px 0px 0 #FFF,
+        6px 0px 0 #FFF,
+        12px 12px 0 rgba(0, 0, 0, 0.25);
+    /* Drop shadow */
+}
+
+/* --- Scan Screen Redesign --- */
+.scan-layout {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 30px;
+    padding: 20px;
+    width: 100%;
+    height: 100%;
+}
+
+.timer-box {
+    display: flex;
+    width: 303px;
+    height: 97px;
+    padding: 0 78px;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    border: 8px solid #EA2500;
+    background: #FFF;
+    box-shadow: 6px 6px 0 0 rgba(234, 37, 0, 0.50);
+}
+
+.timer-box.warning {
+    animation: timerPulse 0.5s ease-in-out infinite alternate;
+}
+
+.score-box {
+    display: flex;
+    width: 550px;
+    height: 97px;
+    padding: 0 78px;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    border: 8px solid #EA2500;
+    background: #FFF;
+    box-shadow: 6px 6px 0 0 rgba(234, 37, 0, 0.50);
+}
+
+
+@keyframes timerPulse {
+    from {
+        transform: scale(1);
+    }
+
+    to {
+        transform: scale(1.05);
+    }
+}
+
+.timer-text {
+    color: #2F3061;
+    text-align: center;
+    font-family: "Dogica Pixel";
+    font-size: 64px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: normal;
+}
+
+.scenario-box {
+    display: flex;
+    width: 824px;
+    height: 324px;
+    padding: 50px;
+    justify-content: center;
+    align-items: center;
+    gap: 30px;
+    border: 8px solid #2F3061;
+    background: #FFF;
+    box-shadow: 6px 6px 0 0 rgba(0, 0, 0, 0.25);
+}
+
+.scenario-box-image {
+    width: 200px;
+    height: 224px;
+    flex-shrink: 0;
+    object-fit: contain;
+    image-rendering: pixelated;
+}
+
+.scenario-box-text {
+    flex: 1;
+    align-self: center;
+    color: #2F3061;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 500;
+    font-size: 36px;
+    font-style: normal;
+    line-height: 36px;
+}
+
+.scan-grid-container {
+    display: flex;
+    width: 1122px;
+    padding: 10px;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    border: 8px solid #2F3061;
+    background: #6A6BA0;
+    box-shadow: 8px 8px 0 0 rgba(0, 0, 0, 0.25);
+}
+
+.scan-items-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 268px);
+    gap: 10px;
+}
+
+.scan-item-slot {
+    display: flex;
+    width: 268px;
+    height: 101px;
+    padding: 0 20px;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    border: 6px solid #2F3061;
+    background: #E8E8F0;
+    /* Empty state - slightly dark */
+    font-family: "Dogica Pixel";
+    font-size: 18px;
+    color: #2F3061;
+    text-align: center;
+    word-break: break-word;
+}
+
+.scan-item-slot.filled {
+    background: #FFF;
+    /* Filled state - white */
+}
+
+.scan-item-slot.unused {
+    background: #2F3061;
+    /* Unused state - indigo */
+    border-color: #2F3061;
+}
+
+/* --- Navigation Buttons (HTML/CSS) --- */
+.nav-button {
+    position: fixed;
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: flex-end;
+    padding: 10px 10px 10px 10px;
+    align-items: center;
+    gap: 15px;
+    border: 6px solid var(--Red, #EA2500);
+    background: var(--White, #FFF);
+    box-shadow: 6px 6px 0 0 rgba(234, 37, 0, 0.50);
+    z-index: 9999;
+    /* Pixelated look */
+    image-rendering: pixelated;
+    font-family: "Dogica Pixel";
+}
+
+.nav-button img {
+    width: 60px;
+    height: 60px;
+    aspect-ratio: 1/1;
+    object-fit: contain;
+}
+
+.nav-button span {
+    color: var(--Indigo, #2F3061);
+    font-family: "Dogica Pixel";
+    font-size: 30px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 30px;
+    /* 100% */
+}
+
+/* Red Style (NEXT) */
+.nav-button.red {
+    color: #2F3061;
+    /* Text color usually dark blue/black per images */
+}
+
+/* Blue Style (RESTART/EXIT) */
+.nav-button.blue {
+    border: 6px solid #2F3061;
+    color: #2F3061;
+    box-shadow: 6px 6px 0 0 rgba(0, 0, 0, 0.25);
+    flex-direction: row;
+    justify-content: flex-start;
+}
+
+/* SCAN TO START button - larger image */
+.nav-button.blue.center-bottom img {
+    width: 100px;
+    height: 100px;
+}
+
+
+
+.nav-button.inside-box {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    left: auto;
+    transform: none;
+}
+
+.nav-button.outside-dialogue {
+    position: absolute;
+    top: 100%;
+    /* Start below the box */
+    margin-top: 20px;
+    /* Add gap */
+    bottom: auto;
+    right: 0;
+    left: auto;
+    transform: none;
+}
+
+.nav-button.center-bottom {
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    right: auto;
+    top: auto;
+}
+
+.nav-button.default-pos {
+    bottom: 40px;
+    right: 40px;
+    left: auto;
+    top: auto;
+    transform: none;
+}
+
+
+
+/* Small Size Variant */
+.nav-button.small {
+    gap: 10px;
+}
+
+/* Dialogue Size Variant (User Requested 25x20) */
+.nav-button.dialogue {
+    gap: 10px;
+}
+
+/* Specific Positioning Classes */
+
+/* Default (Bottom Right) - Standard for Scan/Etc if not overridden */
+.nav-button.default-pos {
+    bottom: 30px;
+    right: 30px;
+}
+
+/* Center Bottom (Welcome Screen) */
+.nav-button.center-bottom {
+    bottom: 50px;
+    left: 50%;
+    transform: translateX(-50%);
+    right: auto;
+}
+
+/* Outside Box (Dialogue) - Positioned relative to screen but conceptually "outside box" */
+/* Assuming "Dialogue Box" is centered or bottom. "Outside" means just normal bottom right? */
+/* User said "follow the bottom right of the dialogue box OUTSIDE the text box" */
+/* Dialogues are usually centered. If we want it "outside", maybe offset from center? */
+/* Or just standard Bottom Right of screen works "outside" the centered box. */
+/* Let's stick to fixed screen position for stability unless requested to anchor to div. */
+.nav-button.outside-box {
+    bottom: 30px;
+    right: 30px;
+    box-shadow: none;
+    /* Match inside-box style */
+}
+
+/* Inside Box (Feedback / Demo) */
+/* To put it INSIDE, we might need to append it TO the box in JS, OR position it over the box. */
+/* Position Absolute relative to the container? */
+/* Let's use a class that positions it relative to the viewport but matching the box's layout */
+/* OR we append the button *into* the box in JS. */
+/* User said: "put the next button INSIDE the textboxes but at the bottom right." */
+/* If we append to box, we need static positioning or absolute relative to box. */
+.nav-button.inside-box {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    z-index: 10;
+    box-shadow: none;
+    /* optional */
+}
+
+/* Specific Positioning */
+#nav-next-container {
+    bottom: 30px;
+    right: 30px;
+}
+
+#nav-exit-container {
+    display: flex;
+    /* For alignment */
+    top: 30px;
+    left: 30px;
+}
+
+/* Hide by default class */
+.hidden {
+    display: none !important;
+}
+
+/* --- Thank You Screen --- */
+.thankyou-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 1000px;
+    /* Adjust based on image */
+    padding: 40px;
+    position: relative;
+}
+
+.thankyou-box {
+    background: white;
+    border: 8px solid #2F3061;
+    padding: 40px;
+    text-align: center;
+    max-width: 800px;
+    box-shadow: 8px 8px 0 0 rgba(0, 0, 0, 0.25);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+
+.thankyou-title {
+    color: #2F3061;
+    font-family: "Dogica Pixel";
+    font-size: 4rem;
+    font-weight: 700;
+    margin-bottom: 20px;
+}
+
+.thankyou-text {
+    color: #2F3061;
+    font-family: "Nunito";
+    font-size: 1.5rem;
+    font-weight: 500;
+    line-height: 1.5;
+}
+
+/* --- Selection Screen --- */
+.selection-textbox {
+    display: inline-flex;
+    padding: 30px 50px;
+    justify-content: center;
+    align-items: center;
+    gap: 30px;
+    border: 8px solid #2F3061;
+    background: #FFF;
+    box-shadow: 6px 6px 0 0 rgba(0, 0, 0, 0.25);
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.selection-textbox .bravo-head {
+    width: 108px;
+    height: 80px;
+    flex-shrink: 0;
+    object-fit: contain;
+}
+
+.selection-card {
+    display: flex;
+    width: 407px;
+    height: 546px;
+    padding: 47px 73px;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    border: 8px solid #2F3061;
+    background: #FFF;
+    box-shadow: 8px 8px 0 0 rgba(0, 0, 0, 0.25);
+}
+
+.selection-qr-code {
+    width: 100%;
+    height: 100px;
+    object-fit: contain;
+    image-rendering: pixelated;
+    margin-bottom: 10px;
+}
+
+.selection-bag-image {
+    width: 100%;
+    height: calc(100% - 20px);
+    /* Account for QR code height + margin */
+    object-fit: contain;
+    image-rendering: pixelated;
+}
+
+/* optional row container */
+.selection-cards-row {
+    display: flex;
+    gap: 30px;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+/* Selection container to stack textbox above cards */
+.selection-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+
+/* --- Demo Screen Video Box --- */
+.demo-video-box {
+    display: flex;
+    width: 407px;
+    height: 547px;
+    padding: 20px;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    border: 9px solid #2F3061;
+    background: #FFF;
+    box-shadow: 8px 8px 0 0 rgba(0, 0, 0, 0.25);
+    animation: chunkyExpand 0.4s steps(8) forwards;
+}
+
+.demo-video-box video {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    border-radius: 0;
+}
+
+/* --- Countdown Screen --- */
+.countdown-text {
+    color: #2F3061;
+    text-align: center;
+    font-family: "Pixelify Sans", cursive;
+    font-size: 200px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: normal;
+    text-shadow:
+        -6px -6px 0 #FFF,
+        6px -6px 0 #FFF,
+        -6px 6px 0 #FFF,
+        6px 6px 0 #FFF,
+        0px -6px 0 #FFF,
+        0px 6px 0 #FFF,
+        -6px 0px 0 #FFF,
+        6px 0px 0 #FFF,
+        12px 12px 0 rgba(0, 0, 0, 0.25);
+    /* Drop shadow */
+}
+
+.thankyou-code-img {
+    width: 150px;
+    height: 150px;
+    image-rendering: pixelated;
+    border: 4px solid #2F3061;
+    margin-top: 20px;
+}
+
+.bravo-thankyou-img {
+    position: absolute;
+    bottom: -50px;
+    left: -100px;
+    /* Adjust based on look */
+    width: 300px;
+    /* Adjust size */
+    height: auto;
+}
+
+.evaluate-layout {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    gap: 2rem;
+}
+
+.layout-left {
+    flex: 1;
+    /* Left side takes remaining space */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    /* Center content */
+    padding: 2rem;
+}
+
+.layout-right {
+    width: 50%;
+    /* Right side takes 50% */
+    max-width: 800px;
+    background: #e2e8f0;
+    /* Light grey background for the container */
+    padding: 20px;
+    border-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+/* Grid System */
+.items-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(5, 1fr);
+    /* Assumes 15 items default */
+    gap: 15px;
+    width: 100%;
+    height: 100%;
+}
+
+.item-slot {
+    background: #cbd5e1;
+    /* Greyed out box */
+    border-radius: 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #475569;
+    padding: 10px;
+    text-align: center;
+    border: 2px solid transparent;
+    transition: all 0.3s;
+    min-height: 60px;
+    /* Ensure visibility */
+    word-break: break-word;
+}
+
+.item-slot.filled {
+    background: white;
+    border-color: #94a3b8;
+    color: #1e293b;
+}
+
+/* Evaluation Colors */
+.item-slot.status-correct {
+    background: #dcfce7;
+    border-color: #10b981;
+    color: #064e3b;
+}
+
+.scan-content-container {
+    display: flex;
+    width: 1122px;
+    flex-direction: column;
+    align-items: center;
+    gap: -50px;
+}
+
+.scan-grid-container {
+    display: flex;
+    padding: 10px;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    align-self: stretch;
+    border: 8px solid #2F3061;
+    background: #6A6BA0;
+    box-shadow: 8px 8px 0 0 rgba(0, 0, 0, 0.25);
+}
+
+.scan-items-grid {
+    display: grid;
+    row-gap: 10px;
+    column-gap: 10px;
+    align-self: stretch;
+    width: 100%;
+    justify-content: center;
+    grid-template-rows: repeat(4, fit-content(100%));
+    grid-template-columns: repeat(4, 268px);
+}
+
+.item-counter-box {
+    display: flex;
+    padding: 10px;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    border: 6px solid #2F3061;
+    background: rgba(255, 255, 255, 0.20);
+    font-family: "Dogica Pixel", cursive;
+    font-size: 24px;
+    font-weight: 600;
+    color: #FFF;
+    align-self: flex-end;
+}
+
+/* Screen Title specific for left layout */
+.layout-left h2 {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    color: #1e293b;
+}
+
+.layout-left .scenario-text {
+    font-size: 1.5rem;
+    color: var(--accent-color);
+    font-weight: 700;
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.ai-rating {
+    font-size: 6rem;
+    font-weight: 900;
+    color: var(--accent-color);
+    margin: 1rem 0;
+}
+
+/* Evaluation color states */
+.scan-item-slot.status-correct {
+    background: #86efac;
+    /* Green */
+}
+
+.scan-item-slot.status-okay {
+    background: #fde047;
+    /* Yellow */
+}
+
+.scan-item-slot.status-wrong {
+    background: #fca5a5;
+    /* Red */
+}
+
+/* --- Evaluate Screen Comment Box --- */
+.eval-comment-box {
+    display: flex;
+    width: 1102px;
+    height: 324px;
+    padding: 40px;
+    justify-content: center;
+    align-items: center;
+    gap: 30px;
+    border: 8px solid #2F3061;
+    background: #FFF;
+    box-shadow: 6px 6px 0 0 rgba(0, 0, 0, 0.25);
+}
+
+.eval-comment-text {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    flex: 1 0 0;
+    align-self: stretch;
+    overflow: hidden;
+    color: #2F3061;
+    text-overflow: ellipsis;
+    font-family: "Nunito";
+    font-size: 18px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 140%;
+}
+
+/* --- Scan & Evaluate Screen (Shared Grid) --- */
+.evaluate-layout {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    gap: 2rem;
+}
+
+.layout-left {
+    flex: 1;
+    /* Left side takes remaining space */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    /* Center content */
+    padding: 2rem;
+}
+
+.layout-right {
+    width: 50%;
+    /* Right side takes 50% */
+    max-width: 800px;
+    background: #e2e8f0;
+    /* Light grey background for the container */
+    padding: 20px;
+    border-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+/* Grid System */
+.items-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(5, 1fr);
+    /* Assumes 15 items default */
+    gap: 15px;
+    width: 100%;
+    height: 100%;
+}
+
+.item-slot {
+    background: #cbd5e1;
+    /* Greyed out box */
+    border-radius: 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #475569;
+    padding: 10px;
+    text-align: center;
+    border: 2px solid transparent;
+    transition: all 0.3s;
+    min-height: 60px;
+    /* Ensure visibility */
+    word-break: break-word;
+}
+
+.item-slot.filled {
+    background: white;
+    border-color: #94a3b8;
+    color: #1e293b;
+}
+
+/* Evaluation Colors */
+.item-slot.status-correct {
+    background: #dcfce7;
+    border-color: #10b981;
+    color: #064e3b;
+}
+
+.item-slot.status-okay {
+    background: #fef3c7;
+    border-color: #f59e0b;
+    color: #78350f;
+}
+
+.item-slot.status-wrong {
+    background: #fee2e2;
+    border-color: #ef4444;
+    color: #7f1d1d;
+}
+
+/* Screen Title specific for left layout */
+.layout-left h2 {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    color: #1e293b;
+}
+
+.layout-left .scenario-text {
+    font-size: 1.5rem;
+    color: var(--accent-color);
+    font-weight: 700;
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.ai-rating {
+    font-size: 6rem;
+    font-weight: 900;
+    color: var(--accent-color);
+    margin: 1rem 0;
+}
+
+.ai-description {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+}
+
+
+/* Countdown Animation */
+@keyframes popIn {
+    0% {
+        transform: scale(0.5);
+        opacity: 0;
+    }
+
+    80% {
+        transform: scale(1.2);
+        opacity: 1;
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.countdown-text {
+    animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+/* Feedback Screen Overlay Logic */
+.feedback-image-box {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.feedback-overlay-icon {
+    position: static;
+    transform: none;
+    margin-top: 20px;
+    width: 60px;
+    height: auto;
+    z-index: 10;
+}
+
+/* Hiding title/desc in Feedback Screen as requested */
+#feedback-screen h1,
+#feedback-screen>p {
+    visibility: hidden;
+}
+
+/* Text Emphasis Classes */
+.text-emphasis-salmon {
+    color: var(--salmon-red);
+    font-weight: bold;
+}
