@@ -953,7 +953,6 @@ button:hover {
     height: 140px;
     padding: 10px;
     image-rendering: pixelated;
-    border: 4px solid #2F3061;
     margin-top: 20px;
 }
 
