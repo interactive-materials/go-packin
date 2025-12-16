@@ -65,6 +65,7 @@ body {
     justify-content: center;
     align-items: center;
     overflow: hidden;
+    background-color: #58C4E5;
 }
 
 #app {
@@ -78,25 +79,27 @@ body {
 /* --- Background Classes --- */
 /* Common container styles */
 .app-container {
-    width: 100%;
-    height: 100%;
+    width: 1920px;
+    height: 1080px;
+    transform: scale(calc(100vh / 1080px));
     position: relative;
     background: transparent;
     overflow: hidden;
     z-index: 0;
+    flex-shrink: 0;
 }
 
 /* Scrolling Background Layer */
 .bg-scrolling::before {
     content: "";
     position: absolute;
-    width: 200%;
-    height: 200%;
+    width: 3840px;
+    height: 2160px;
     top: -50%;
     left: -50%;
     z-index: -1;
     background-color: #58C4E5;
-    background-image: url('default background.png');
+    background-image: url('images/default background.png');
     background-repeat: repeat;
     background-position: var(--bg-x, 0px) var(--bg-y, 0px);
 
@@ -109,7 +112,7 @@ body {
 
 /* Static Apartment Background */
 .bg-apartment {
-    background-image: url('apartmentbackground.png');
+    background-image: url('images/apartmentbackground.png');
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -610,7 +613,7 @@ button:hover {
 
 /* --- Navigation Buttons (HTML/CSS) --- */
 .nav-button {
-    position: fixed;
+    position: absolute;
     display: flex;
     flex-direction: row-reverse;
     justify-content: flex-end;
@@ -841,9 +844,9 @@ button:hover {
 
 .selection-card {
     display: flex;
-    width: 407px;
+    width: min(407px, 30%);
     height: 546px;
-    padding: 47px 73px;
+    padding: 47px min(73px, 5%);
     flex-direction: column;
     justify-content: center;
     align-items: center;
@@ -932,8 +935,9 @@ button:hover {
 }
 
 .thankyou-code-img {
-    width: 150px;
-    height: 150px;
+    width: 140px;
+    height: 140px;
+    padding: 10px;
     image-rendering: pixelated;
     border: 4px solid #2F3061;
     margin-top: 20px;
@@ -1132,7 +1136,7 @@ button:hover {
     color: #2F3061;
     text-overflow: ellipsis;
     font-family: "Nunito";
-    font-size: 18px;
+    font-size: 24px;
     font-style: normal;
     font-weight: 500;
     line-height: 140%;

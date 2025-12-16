@@ -35,6 +35,7 @@ const loadSettings = () => {
     try {
         const stored = localStorage.getItem('appConfig');
         return stored ? JSON.parse(stored) : null;
+        
     } catch (e) {
         console.warn('Failed to load settings', e);
         return null;
@@ -61,7 +62,7 @@ const defaultSettings = {
     showManualInput: false,
     backgroundSpeed: 20, // seconds
     backgroundOffset: 0, // initial offset
-    apiKey: 'null' // END OF PROJECT - Valencia's Key Default
+    apiKey: 'AIzaSyCfBxHxmN91mTlX_whR-uXzTPEwJVtCdUg' // END OF PROJECT - Valencia's Key Default
 };
 
 const savedSettings = loadSettings();
@@ -270,7 +271,7 @@ const CountdownScreen = (state, dispatch) => {
 
 const StartScreen = (state, dispatch) => {
     const logo = document.createElement('img');
-    logo.src = 'Logo.png';
+    logo.src = 'images/Logo.png';
     logo.style.maxWidth = '18%'; // Reduced from 60% as requested (3.5x smaller)
     logo.style.height = 'auto';
     logo.style.marginBottom = '5vh'; // Use vh for responsive spacing
@@ -279,7 +280,7 @@ const StartScreen = (state, dispatch) => {
     instruction.textContent = "";
 
     // Start Button
-    const startBtn = createNavButton("SCAN TO\nSTART", "nextCodeOnly.jpg", "blue", "center-bottom");
+    const startBtn = createNavButton("SCAN TO\nSTART", "images/QRcode/nextCodeOnly.jpg", "blue", "center-bottom");
     // Enable multiline
     const btnSpan = startBtn.querySelector('span');
     if (btnSpan) {
@@ -321,7 +322,7 @@ const IntroScreen = (state, dispatch) => {
 
     // Using PNG for animation
     const pandaImg = document.createElement('img');
-    pandaImg.src = 'BravoTheRedPandaDialogue.png';
+    pandaImg.src = 'images/Bravo/BravoTheRedPandaDialogue.png';
     pandaImg.id = 'panda-img'; // For animation
     pandaImg.className = 'panda-img';
     pandaContainer.appendChild(pandaImg);
@@ -349,7 +350,7 @@ const IntroScreen = (state, dispatch) => {
 
     // Next Button (formatted as per requirements)
     // Next Button (formatted as per requirements)
-    const nextBtn = createNavButton("NEXT", "nextCodeOnly.jpg", "red", "outside-dialogue dialogue");
+    const nextBtn = createNavButton("NEXT", "images/QRcode/nextCodeOnly.jpg", "red", "outside-dialogue dialogue");
     nextBtn.onclick = () => dispatch({ type: 'INTRO_NEXT' });
 
     wrapper.appendChild(textBox);
@@ -378,7 +379,7 @@ const DemoScreen = (state, dispatch) => {
 
     // Character face image (inside the box)
     const faceImg = document.createElement('img');
-    faceImg.src = 'bravo-face.svg';
+    faceImg.src = 'images/Bravo/bravo-face.svg';
     faceImg.alt = 'Bravo the Red Panda';
     faceImg.className = 'character-face';
 
@@ -404,7 +405,7 @@ const DemoScreen = (state, dispatch) => {
     textBox.appendChild(textContent);
 
     // NEXT Button inside text box
-    const nextBtn = createNavButton("NEXT", "nextCodeOnly.jpg", "red", "inside-box small");
+    const nextBtn = createNavButton("NEXT", "images/QRcode/nextCodeOnly.jpg", "red", "inside-box small");
     nextBtn.onclick = () => dispatch({ type: 'DEMO_NEXT' });
     textBox.appendChild(nextBtn);
 
@@ -413,7 +414,7 @@ const DemoScreen = (state, dispatch) => {
     videoBox.className = 'demo-video-box';
 
     const video = document.createElement('video');
-    video.src = 'demovid.mp4';
+    video.src = 'videos/demovid.mp4';
     video.muted = true;
     video.autoplay = true;
     video.loop = true;
@@ -760,7 +761,7 @@ const SelectionScreen = (state, dispatch) => {
     instructionBox.className = 'selection-textbox';
 
     const bravoHead = document.createElement('img');
-    bravoHead.src = 'bravo-face.svg';
+    bravoHead.src = 'images/Bravo/bravo-face.svg';
     bravoHead.alt = 'Bravo the Red Panda';
     bravoHead.className = 'bravo-head';
 
@@ -779,9 +780,9 @@ const SelectionScreen = (state, dispatch) => {
 
     // Images
     const images = [
-        { src: 'FirstAidKit.png', name: 'First Aid Kit' },
-        { src: 'FirstAidBag.png', name: 'First Aid Bag' },
-        { src: 'GoBag.png', name: 'GoBag' }
+        { src: 'images/Items/FirstAidKit.png', name: 'First Aid Kit' },
+        { src: 'images/Items/FirstAidBag.png', name: 'First Aid Bag' },
+        { src: 'images/Items/GoBag.png', name: 'GoBag' }
     ];
 
     images.forEach(imgData => {
@@ -790,8 +791,9 @@ const SelectionScreen = (state, dispatch) => {
         card.onclick = () => dispatch({ type: 'SELECT_ITEM', payload: imgData.name });
 
         // QR code image
+        const qrCodeName = imgData.src.split('/').pop();
         const qrCodeImg = document.createElement('img');
-        qrCodeImg.src = `images/QRcode/${imgData.src}`;
+        qrCodeImg.src = `images/QRcode/${qrCodeName}`;
         qrCodeImg.alt = `${imgData.name} QR Code`;
         qrCodeImg.className = 'selection-qr-code';
 
@@ -829,11 +831,10 @@ const FeedbackScreen = (state, dispatch) => {
 
     // Character face image (inside the box)
     const face = document.createElement('img');
-    face.src = 'bravo-face.svg';
+    face.src = 'images/Bravo/bravo-face.svg';
     face.alt = 'Bravo the Red Panda';
     face.className = 'character-face';
 
-    // The actual text message
     // The actual text message
     const feedbackMsg = document.createElement('p');
     feedbackMsg.className = 'feedback-message';
@@ -858,7 +859,7 @@ const FeedbackScreen = (state, dispatch) => {
     feedbackText.appendChild(feedbackMsg);
 
     // NEXT Button inside text box
-    const nextBtn = createNavButton("NEXT", "nextCodeOnly.jpg", "red", "inside-box small");
+    const nextBtn = createNavButton("NEXT", "images/QRcode/nextCodeOnly.jpg", "red", "inside-box small");
     nextBtn.onclick = () => {
         if (state.selectionResult === 'correct') {
             dispatch({ type: 'NAVIGATE', payload: 'demo' });
@@ -874,10 +875,10 @@ const FeedbackScreen = (state, dispatch) => {
 
     // Dynamic Image Selection
     // Map Item Name -> Filename
-    let itemImageSrc = 'GoBag.png'; // Default
-    if (state.selectedItem === 'First Aid Kit') itemImageSrc = 'FirstAidKit.png';
-    else if (state.selectedItem === 'First Aid Bag') itemImageSrc = 'FirstAidBag.png';
-    else if (state.selectedItem === 'GoBag') itemImageSrc = 'GoBag.png';
+    let itemImageSrc = 'images/Items/GoBag.png'; // Default
+    if (state.selectedItem === 'First Aid Kit') itemImageSrc = 'images/Items/FirstAidKit.png';
+    else if (state.selectedItem === 'First Aid Bag') itemImageSrc = 'images/Items/FirstAidBag.png';
+    else if (state.selectedItem === 'GoBag') itemImageSrc = 'images/Items/GoBag.png';
 
     const bagImg = document.createElement('img');
     bagImg.src = itemImageSrc;
@@ -888,10 +889,10 @@ const FeedbackScreen = (state, dispatch) => {
     const overlayIcon = document.createElement('img');
     overlayIcon.className = 'feedback-overlay-icon';
     if (state.selectionResult === 'correct') {
-        overlayIcon.src = 'tick.png';
+        overlayIcon.src = 'images/tick.png';
         overlayIcon.alt = 'Correct';
     } else {
-        overlayIcon.src = 'cross.png';
+        overlayIcon.src = 'images/cross.png';
         overlayIcon.alt = 'Wrong';
     }
     feedbackImgBox.appendChild(overlayIcon);
@@ -980,7 +981,7 @@ const ScanScreen = (state, dispatch) => {
     scenarioBox.className = 'scenario-box';
 
     const scenarioImg = document.createElement('img');
-    scenarioImg.src = 'GoBag.png';
+    scenarioImg.src = 'images/Items/GoBag.png';
     scenarioImg.alt = 'Go Bag';
     scenarioImg.className = 'scenario-box-image';
 
@@ -1174,25 +1175,27 @@ const EvaluateScreen = (state, dispatch) => {
         sound.play();
     }
 
-    try {
-        let cleanResponse = state.aiResponse.trim();
-        // Remove markdown code blocks if present
-        if (cleanResponse.startsWith('```json')) {
-            cleanResponse = cleanResponse.replace(/^```json\s*/, '').replace(/\s*```$/, '');
-        } else if (cleanResponse.startsWith('```')) {
-            cleanResponse = cleanResponse.replace(/^```\s*/, '').replace(/\s*```$/, '');
-        }
+    if (state.aiResponse && state.aiResponse.trim()) {
+        try {
+            let cleanResponse = state.aiResponse.trim();
+            // Remove markdown code blocks if present
+            if (cleanResponse.startsWith('```json')) {
+                cleanResponse = cleanResponse.replace(/^```json\s*/, '').replace(/\s*```$/, '');
+            } else if (cleanResponse.startsWith('```')) {
+                cleanResponse = cleanResponse.replace(/^```\s*/, '').replace(/\s*```$/, '');
+            }
 
-        const parsed = JSON.parse(cleanResponse);
-        if (parsed.rating && parsed.description) {
-            rating = parsed.rating;
-            description = parsed.description;
+            const parsed = JSON.parse(cleanResponse);
+            if (parsed.rating && parsed.description) {
+                rating = parsed.rating;
+                description = parsed.description;
+            }
+            if (parsed.items && Array.isArray(parsed.items)) {
+                categorizedItems = parsed.items;
+            }
+        } catch (e) {
+            console.warn('Failed to parse AI response as JSON:', e);
         }
-        if (parsed.items && Array.isArray(parsed.items)) {
-            categorizedItems = parsed.items;
-        }
-    } catch (e) {
-        console.warn('Failed to parse AI response as JSON:', e);
     }
 
     // Main vertical layout (matching ScanScreen)
@@ -1214,7 +1217,7 @@ const EvaluateScreen = (state, dispatch) => {
     commentBox.className = 'eval-comment-box';
 
     const bravoImg = document.createElement('img');
-    bravoImg.src = 'bravo-face.svg';
+    bravoImg.src = 'images/Bravo/bravo-face.svg';
     bravoImg.alt = 'Bravo the Red Panda';
     bravoImg.className = 'scenario-box-image';
 
@@ -1505,6 +1508,17 @@ const App = (rootId) => {
 
     const dispatch = (action) => {
         // Wrapper to handle side effects like Limit Reached
+        if (action.type === 'START_SITUATION') {
+            try {
+                const sound = new Howl({
+                    src: ['./audio/game_start.ogg']
+                });
+                sound.play();
+            } catch (e) {
+                console.warn("Game Start Sound Error:", e);
+            }
+        }
+
         if (action.type === 'ADD_ITEM') {
             const prevState = { ...state };
 
@@ -1696,7 +1710,7 @@ const App = (rootId) => {
         // QR Code for external link
         const code = document.createElement('img');
         code.className = 'thankyou-code-img';
-        code.src = 'thankyoucode.png'; // Verified filename
+        code.src = 'images/QRcode/thankyoucode.png'; // Verified filename
         code.alt = 'Scan for more info';
 
         thankYouBox.appendChild(title);
@@ -1705,11 +1719,11 @@ const App = (rootId) => {
 
         // Bravo Image (Decoration)
         const bravoImg = document.createElement('img');
-        bravoImg.src = 'BravoThankYou.png'; // Verified filename
+        bravoImg.src = 'images/Bravo/BravoThankYou.png'; // Verified filename
         bravoImg.className = 'bravo-thankyou-img';
 
         // Play Again Button (Red)
-        const playAgainBtn = createNavButton("PLAY AGAIN", "nextCodeOnly.jpg", "red", "default-pos");
+        const playAgainBtn = createNavButton("PLAY AGAIN", "images/QRcode/nextCodeOnly.jpg", "red", "default-pos");
         playAgainBtn.onclick = () => dispatch({ type: 'RESET' });
 
         // Append to container
@@ -1784,14 +1798,14 @@ const App = (rootId) => {
         // EXIT / RESTART Button (Global)
         let exitBtn = document.getElementById('nav-exit-container');
         if (!exitBtn) {
-            exitBtn = createNavButton('RESTART', 'exitCodeOnly.jpg', 'blue', 'default-pos');
+            exitBtn = createNavButton('RESTART', 'images/QRcode/exitCodeOnly.jpg', 'blue', 'default-pos');
             exitBtn.id = 'nav-exit-container';
             exitBtn.style.top = '30px';
             exitBtn.style.left = '30px';
             exitBtn.style.bottom = 'auto';
             exitBtn.style.right = 'auto';
             exitBtn.onclick = () => dispatch({ type: 'RESET' });
-            document.body.appendChild(exitBtn);
+            container.appendChild(exitBtn);
         }
 
         // Hide Restart on Start, Countdown, Evaluate, ThankYou
@@ -1820,9 +1834,9 @@ const App = (rootId) => {
         if (screensNeedingGenericNext.includes(state.currentScreen)) {
             let genericNext = document.getElementById('nav-generic-next');
             if (!genericNext) {
-                genericNext = createNavButton('NEXT', 'nextCodeOnly.jpg', 'red', 'default-pos');
+                genericNext = createNavButton('NEXT', 'images/QRcode/nextCodeOnly.jpg', 'red', 'default-pos');
                 genericNext.id = 'nav-generic-next';
-                document.body.appendChild(genericNext);
+                container.appendChild(genericNext);
             }
             genericNext.style.display = 'flex';
 
@@ -1939,22 +1953,22 @@ const App = (rootId) => {
                 // Determine current clip from filename
                 // Using includes() for safety against absolute paths
                 // Note: Windows filenames are case-insensitive usually, but let's match exact file list: AnimationA.mp4
-                if (src.includes('AnimationA.mp4')) {
+                if (src.includes('videos/AnimationA.mp4')) {
                     // A done -> B
-                    vid.src = 'AnimationB.mp4';
+                    vid.src = 'videos/AnimationB.mp4';
                     vid.play();
-                } else if (src.includes('AnimationB.mp4')) {
+                } else if (src.includes('videos/AnimationB.mp4')) {
                     // B done. Check AI
                     const appState = window.appState; // Access global state
                     if (appState && appState.aiReady) {
                         // AI Ready -> C
-                        vid.src = 'AnimationC.mp4';
+                        vid.src = 'videos/AnimationC.mp4';
                         vid.play();
                     } else {
                         // Not ready -> Loop B
                         vid.play();
                     }
-                } else if (src.includes('AnimationC.mp4')) {
+                } else if (src.includes('videos/AnimationC.mp4')) {
                     // C done -> Finish
                     // Dispatch via global dispatch? We don't have dispatch here easily unless we capture it.
                     // But we can trigger a custom event or click a hidden button?
@@ -1976,7 +1990,7 @@ const App = (rootId) => {
                 // Just entered loading state
                 loadingOverlay.style.display = 'flex';
                 const vid = document.getElementById('loading-video');
-                vid.src = 'AnimationA.mp4';
+                vid.src = 'videos/AnimationA.mp4';
                 vid.play().catch(e => console.log("Autoplay blocked", e));
             }
         } else {
@@ -1993,6 +2007,7 @@ const App = (rootId) => {
         // Barcode Navigation Logic
         if (e.key === 'Enter') {
             const buffer = keyBuffer.toUpperCase().trim();
+            console.log(`[BARCODE DEBUG] Screen: ${state.currentScreen}, Buffer: "${buffer}"`);
             if (state.config.showDebug) console.log(`DEBUG KEYDOWN: Ent received. Buffer: '${buffer}'`);
 
             // EXIT Code Logic - Global
@@ -2145,9 +2160,9 @@ const App = (rootId) => {
                     const panda = document.getElementById('panda-img');
                     if (panda) {
                         if (currentTypeIndex % 2 === 0) {
-                            panda.src = 'BravoTheRedPandaDialogueTalking.png';
+                            panda.src = 'images/Bravo/BravoTheRedPandaDialogueTalking.png';
                         } else {
-                            panda.src = 'BravoTheRedPandaDialogue.png';
+                            panda.src = 'images/Bravo/BravoTheRedPandaDialogue.png';
                         }
                     }
 
@@ -2157,7 +2172,7 @@ const App = (rootId) => {
 
                     // Reset to Idle
                     const pandaDone = document.getElementById('panda-img');
-                    if (pandaDone) pandaDone.src = 'BravoTheRedPandaDialogue.png';
+                    if (pandaDone) pandaDone.src = 'images/Bravo/BravoTheRedPandaDialogue.png';
                 }
             }, 50); // Speed: 50ms per char
         } else {
@@ -2170,7 +2185,7 @@ const App = (rootId) => {
             if (!typewriterInterval) {
                 const pandaDone = document.getElementById('panda-img');
                 if (pandaDone && pandaDone.src.includes('Talking')) {
-                    pandaDone.src = 'BravoTheRedPandaDialogue.png';
+                    pandaDone.src = 'images/Bravo/BravoTheRedPandaDialogue.png';
                 }
             }
         }
