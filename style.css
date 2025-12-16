@@ -609,7 +609,7 @@ button:hover {
     color: #2F3061;
     text-align: center;
     word-break: break-word;
-    line-height: 15px;
+    line-height: 30px;
 }
 
 .scan-item-slot.filled {
@@ -1111,12 +1111,12 @@ button:hover {
 
 /* Evaluation color states */
 .scan-item-slot.status-correct {
-    background: #86efac;
+    background: #FFF;
     /* Green */
 }
 
 .scan-item-slot.status-okay {
-    background: #fde047;
+    background: #FFF;
     /* Yellow */
 }
 

@@ -1904,12 +1904,33 @@ const App = (rootId) => {
             loadingBox.style.width = '90%';
             loadingBox.style.textAlign = 'center';
 
-            const video = document.createElement('video');
-            video.id = 'loading-video';
-            video.style.width = '100%';
-            video.style.height = 'auto';
-            video.muted = true;
-            video.playsInline = true;
+            // Create container for videos
+            const videoContainer = document.createElement('div');
+            videoContainer.id = 'video-container';
+            videoContainer.style.width = '100%';
+            videoContainer.style.position = 'relative';
+
+            // Helper to create a video element
+            const createVideo = (id, src) => {
+                const video = document.createElement('video');
+                video.id = id;
+                video.src = src;
+                video.style.width = '100%';
+                video.style.height = 'auto';
+                video.style.display = 'none'; // Hidden by default
+                video.muted = true;
+                video.playsInline = true;
+                video.preload = 'auto'; // Preload for smooth transitions
+                return video;
+            };
+
+            const videoA = createVideo('video-a', 'videos/AnimationA.mp4');
+            const videoB = createVideo('video-b', 'videos/AnimationB.mp4');
+            const videoC = createVideo('video-c', 'videos/AnimationC.mp4');
+
+            videoContainer.appendChild(videoA);
+            videoContainer.appendChild(videoB);
+            videoContainer.appendChild(videoC);
 
             // Text Logic ("Waiting for AI...")
             const loadingText = document.createElement('div');
@@ -1919,25 +1940,27 @@ const App = (rootId) => {
             loadingText.style.textAlign = 'center';
             loadingText.textContent = "Packing your bag...";
 
-            loadingBox.appendChild(video);
+            loadingBox.appendChild(videoContainer);
             loadingBox.appendChild(loadingText);
             loadingOverlay.appendChild(loadingBox); // Append box to overlay
             document.body.appendChild(loadingOverlay);
 
             // ERROR HANDLING / EMERGENCY SKIP
             const skipLoading = () => {
-                const vid = document.getElementById('loading-video');
-                vid.pause();
+                ['video-a', 'video-b', 'video-c'].forEach(id => {
+                    const vid = document.getElementById(id);
+                    if (vid) vid.pause();
+                });
                 if (window.dispatchApp) window.dispatchApp({ type: 'LOADING_COMPLETE' });
             };
 
-            // If video fails (missing file?), skip automatically after short delay
-            video.addEventListener('error', (e) => {
-                const err = video.error;
-                console.error("Loading Video Error:", err);
-                // Show simple message and skip
-                loadingText.textContent = "Loading..."; // Keep it clean, or "Skipping" if you prefer
-                setTimeout(skipLoading, 500); // Faster skip if error
+            // If any video fails (missing file?), skip automatically after short delay
+            [videoA, videoB, videoC].forEach(video => {
+                video.addEventListener('error', (e) => {
+                    console.error("Loading Video Error:", video.id, video.error);
+                    loadingText.textContent = "Loading...";
+                    setTimeout(skipLoading, 500);
+                });
             });
 
             // Click text to force skip (Emergency)
@@ -1945,59 +1968,92 @@ const App = (rootId) => {
             loadingText.title = 'Click to skip animation';
             loadingText.onclick = skipLoading;
 
-            // EVENTS
-            video.addEventListener('ended', () => {
-                const vid = document.getElementById('loading-video');
-                const src = vid.getAttribute('src'); // use getAttribute to be safe or vid.src
+            // EVENTS - Track if we've switched to C to prevent multiple switches
+            let switchedToC = false;
 
-                // Determine current clip from filename
-                // Using includes() for safety against absolute paths
-                // Note: Windows filenames are case-insensitive usually, but let's match exact file list: AnimationA.mp4
-                if (src.includes('videos/AnimationA.mp4')) {
-                    // A done -> B
-                    vid.src = 'videos/AnimationB.mp4';
-                    vid.play();
-                } else if (src.includes('videos/AnimationB.mp4')) {
-                    // B done. Check AI
-                    const appState = window.appState; // Access global state
-                    if (appState && appState.aiReady) {
-                        // AI Ready -> C
-                        vid.src = 'videos/AnimationC.mp4';
-                        vid.play();
-                    } else {
-                        // Not ready -> Loop B
-                        vid.play();
-                    }
-                } else if (src.includes('videos/AnimationC.mp4')) {
-                    // C done -> Finish
-                    // Dispatch via global dispatch? We don't have dispatch here easily unless we capture it.
-                    // But we can trigger a custom event or click a hidden button?
-                    // Or access a global dispatcher if available? 
-                    // `dispatch` is inside App scope.
-                    // We can expose dispatch globally or re-structure.
-                    // EASY HACK: Click the hidden generic next button? No logic mismatch.
-                    // BETTER: Expose dispatch on window.
-                    if (window.dispatchApp) {
-                        window.dispatchApp({ type: 'LOADING_COMPLETE' });
-                    }
+            // Helper to switch videos
+            const switchToVideo = (hideId, showId, shouldLoop = false) => {
+                const hideVid = document.getElementById(hideId);
+                const showVid = document.getElementById(showId);
+                
+                if (hideVid) {
+                    hideVid.pause();
+                    hideVid.currentTime = 0;
+                    hideVid.style.display = 'none';
+                }
+                if (showVid) {
+                    showVid.loop = shouldLoop;
+                    showVid.style.display = 'block';
+                    showVid.play().catch(e => console.log("Autoplay blocked", e));
+                }
+            };
+
+            // Animation A ends -> Play B (looping until AI ready)
+            videoA.addEventListener('ended', () => {
+                switchToVideo('video-a', 'video-b', true); // B loops
+            });
+
+            // Animation B - check periodically if AI is ready
+            // Since B loops, we use 'timeupdate' to check
+            videoB.addEventListener('timeupdate', () => {
+                if (switchedToC) return; // Already switched
+                const appState = window.appState;
+                if (appState && appState.aiReady) {
+                    switchedToC = true;
+                    videoB.loop = false;
+                    switchToVideo('video-b', 'video-c', false);
                 }
             });
+
+            // Animation C ends -> Finish loading
+            videoC.addEventListener('ended', () => {
+                if (window.dispatchApp) {
+                    window.dispatchApp({ type: 'LOADING_COMPLETE' });
+                }
+            });
+
+            // Store reset function for switchedToC flag
+            window.resetLoadingVideos = () => { switchedToC = false; };
         }
 
         // Logic to Show/Hide and Start Animation
         if (state.currentScreen === 'loading') {
             if (loadingOverlay.style.display === 'none') {
-                // Just entered loading state
+                // Just entered loading state - reset and start from A
                 loadingOverlay.style.display = 'flex';
-                const vid = document.getElementById('loading-video');
-                vid.src = 'videos/AnimationA.mp4';
-                vid.play().catch(e => console.log("Autoplay blocked", e));
+                
+                // Reset the switchedToC flag
+                if (window.resetLoadingVideos) window.resetLoadingVideos();
+                
+                // Hide all videos first
+                ['video-a', 'video-b', 'video-c'].forEach(id => {
+                    const vid = document.getElementById(id);
+                    if (vid) {
+                        vid.pause();
+                        vid.currentTime = 0;
+                        vid.style.display = 'none';
+                        vid.loop = false;
+                    }
+                });
+                
+                // Show and play video A
+                const vidA = document.getElementById('video-a');
+                if (vidA) {
+                    vidA.style.display = 'block';
+                    vidA.play().catch(e => console.log("Autoplay blocked", e));
+                }
             }
         } else {
             loadingOverlay.style.display = 'none';
-            // Pause video to save resources?
-            const vid = document.getElementById('loading-video');
-            if (vid) vid.pause();
+            // Pause all videos to save resources
+            ['video-a', 'video-b', 'video-c'].forEach(id => {
+                const vid = document.getElementById(id);
+                if (vid) {
+                    vid.pause();
+                    vid.currentTime = 0;
+                    vid.style.display = 'none';
+                }
+            });
         }
     }; // Close render
     // Global Key Listener for Auto-Focus and Barcode Navigation
