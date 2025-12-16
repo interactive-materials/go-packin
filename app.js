@@ -279,6 +279,17 @@ const StartScreen = (state, dispatch) => {
     const instruction = document.createElement('p');
     instruction.textContent = "";
 
+    // API Key Warning
+    const apiKeyWarning = document.createElement('div');
+    apiKeyWarning.className = 'api-key-warning';
+    
+    // Check if API key is missing or empty
+    if (!state.config.apiKey || state.config.apiKey.trim() === '') {
+        apiKeyWarning.innerHTML = '⚠️ No API Key configured.<br>The game evaluation will not work without one.<br>Please go to Settings to add your API key.';
+    } else {
+        apiKeyWarning.style.display = 'none';
+    }
+
     // Start Button
     const startBtn = createNavButton("SCAN TO\nSTART", "images/QRcode/nextCodeOnly.jpg", "blue", "center-bottom");
     // Enable multiline
@@ -305,7 +316,7 @@ const StartScreen = (state, dispatch) => {
         state.currentScreen === 'start',
         null, // No Title
         null, // No Desc
-        [logo, startBtn] // content
+        [logo, apiKeyWarning, startBtn] // content
     );
 };
 

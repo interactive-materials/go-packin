@@ -1,6 +1,23 @@
 @import url('https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;500;600;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700&display=swap');
 
+/* API Key Warning on Start Screen */
+.api-key-warning {
+    font-family: 'Nunito', sans-serif;
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #dc2626;
+    background-color: rgba(254, 226, 226, 0.95);
+    border: 3px solid #dc2626;
+    border-radius: 12px;
+    padding: 15px 25px;
+    margin-bottom: 20px;
+    text-align: center;
+    max-width: 500px;
+    line-height: 1.6;
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.2);
+}
+
 /* Dogica Pixel Font */
 @font-face {
     font-family: "Dogica Pixel";
