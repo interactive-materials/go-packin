@@ -286,9 +286,9 @@ button:hover {
     color: #2F3061;
     padding: 30px;
     font-size: 1.5rem;
-    font-weight: 700;
+    font-weight: 500;
     box-shadow: 8px 8px 0 0 rgba(0, 0, 0, 0.25);
-    font-family: 'Inter', sans-serif;
+    font-family: 'Nunito', sans-serif;
     position: relative;
     /* For button positioning */
 }
@@ -609,6 +609,7 @@ button:hover {
     color: #2F3061;
     text-align: center;
     word-break: break-word;
+    line-height: 15px;
 }
 
 .scan-item-slot.filled {
@@ -844,6 +845,8 @@ button:hover {
     box-shadow: 6px 6px 0 0 rgba(0, 0, 0, 0.25);
     margin-bottom: 30px;
     text-align: center;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 500;
 }
 
 .selection-textbox .bravo-head {
