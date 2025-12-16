@@ -11,11 +11,16 @@
     border: 3px solid #dc2626;
     border-radius: 12px;
     padding: 15px 25px;
-    margin-bottom: 20px;
     text-align: center;
     max-width: 500px;
     line-height: 1.6;
     box-shadow: 0 4px 12px rgba(220, 38, 38, 0.2);
+    /* Position above the start button */
+    position: absolute;
+    bottom: 220px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 100;
 }
 
 /* Dogica Pixel Font */
@@ -626,7 +631,7 @@ button:hover {
     color: #2F3061;
     text-align: center;
     word-break: break-word;
-    line-height: 30px;
+    line-height: 25px;
 }
 
 .scan-item-slot.filled {

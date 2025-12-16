@@ -62,7 +62,7 @@ const defaultSettings = {
     showManualInput: false,
     backgroundSpeed: 20, // seconds
     backgroundOffset: 0, // initial offset
-    apiKey: 'AIzaSyCfBxHxmN91mTlX_whR-uXzTPEwJVtCdUg' // END OF PROJECT - Valencia's Key Default
+    apiKey: ''
 };
 
 const savedSettings = loadSettings();
