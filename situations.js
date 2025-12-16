@@ -26,7 +26,7 @@ const SITUATIONS = [
     // },
     {
         situation: "dog owner",
-        modelAnswer: "Pet supplies such as a week worth of dog food, collar and leash, feeding bowls, pet documents",
+        modelAnswer: "Dog food, Collar and Leash, Feeding Bowls, Pet Documents",
         rationale: "When evacuating the house, a pet must ensure to be evacuated as well with the necessary items to maintain the pet."
     },
     // {
@@ -46,7 +46,7 @@ const SITUATIONS = [
     },
     {
         situation: "retiree with diabetes",
-        modelAnswer: "Requires a insulin medication, medical documents, emergency contacts list",
+        modelAnswer: "Insulin Medication, Medical Documents, Emergency Contacts List",
         rationale: "When evacuating the house, a retiree with chronic health condition must ensure to be evacuated as well with the necessary items to maintain the condition."
     }
 ];

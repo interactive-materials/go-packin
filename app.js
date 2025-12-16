@@ -7,13 +7,83 @@
 // API Key is now in state.config
 // const API_KEY = '...'; // Removed
 // const API_URL = variable inside callGemini
+
+// =============================================================================
+// REQUIRED ITEMS LISTS - Items that MUST be marked green if present in the bag
+// =============================================================================
+
+// Universal required items for ALL GO bags (non-negotiable essentials)
+const UNIVERSAL_REQUIRED_ITEMS = [
+    'First Aid Kit',
+    'N95 Mask',
+    'Spare Clothing',
+    'Clothes',
+    'Clothing',
+    'Torchlight',
+    'Flashlight',
+    'Torch',
+    'Water',
+    'Bottle of Water',
+    'Water Bottle',
+    'Whistle',
+    'Non-perishable Food',
+    'Dry Food',
+    'Food',
+    'Canned Food',
+    'Canned Meat',
+    'Ritz Biscuits',
+    'Biscuits',
+    'Crackers'
+];
+
+// Helper function to normalize item names for comparison (case-insensitive, trim whitespace)
+const normalizeItemName = (name) => {
+    if (!name) return '';
+    return name.toLowerCase().trim();
+};
+
+// Helper function to check if a scanned item matches any required item
+const isRequiredItem = (scannedItem, requiredList) => {
+    const normalizedScanned = normalizeItemName(scannedItem);
+    return requiredList.some(required => {
+        const normalizedRequired = normalizeItemName(required);
+        // Check for exact match or if one contains the other
+        return normalizedScanned === normalizedRequired ||
+               normalizedScanned.includes(normalizedRequired) ||
+               normalizedRequired.includes(normalizedScanned);
+    });
+};
+
+// Helper function to get scenario-specific required items from a situation object
+const getScenarioRequiredItems = (situationObj) => {
+    if (!situationObj || !situationObj.modelAnswer) return [];
+    // modelAnswer is a comma-separated string of required items
+    return situationObj.modelAnswer.split(',').map(item => item.trim()).filter(item => item);
+};
+
+// Helper function to check if an item should be marked as correct (green)
+// Combines universal required items + scenario-specific items
+const shouldBeGreen = (itemName, situationObj) => {
+    // Check against universal required items
+    if (isRequiredItem(itemName, UNIVERSAL_REQUIRED_ITEMS)) {
+        return true;
+    }
+    // Check against scenario-specific required items
+    const scenarioItems = getScenarioRequiredItems(situationObj);
+    if (isRequiredItem(itemName, scenarioItems)) {
+        return true;
+    }
+    return false;
+};
+
+// =============================================================================
 const originalPrompt = `You are a red cross member in a game about preparing a GO-bag for different kinds of individuals, the player will submit a list of items and you are to evaluate the suitability of the items for the individual and the scenario. 
 Rate and provide a score from 1 to 100 on how appropriate the items are for a GO-bag.
 The definition of a GO-bag is A Go Bag is an essential item that should be prepared in advance and kept readily accessible at all times. It is recommended to be well-stocked with the necessary supplies to ensure your safety, health, and basic comfort for up to three days (72 hours), or until the situation stabilizes and normal conditions are restored, or help arrives.
 || Required non-negotiable items that should be found in the GO-bag include: 
 First Aid Kit, N95 Mask, A set of spare clothing. ||
 Items that are also important and required but can be substituted for with similar items: 
-Torchlight, Water, Whistle, Non-perishable food. Note that Bottle of Water or Ritz Biscuits or Canned Meat were be marked as correct are they fufill their purpose as water or non-perishable food||
+Torchlight, Water, Whistle, Non-perishable food. Note that Bottle of Water or Ritz Biscuits or Canned Meat will be marked as correct are they fufill their purpose as water or non-perishable food||
 If the player has included items that do not represent the listed items required but may be suitable substitutes, evaluate them based on their suitability for use in the context of an emergency GO-bag.
 A 100 point score would be a GO bag that has all the non-negotiables and required items (or very close substitutes) and any other items which are required for the individual.
 oss evaluator in a game, and the goal is to evaluate the items in a emergency bag. Rate from 1 to 100 how apporiate the items are for a GO emergency bag and give ONE description 1 line for the entire list of items in the bag. Required non-negotiable items that should be found in the GO bag include: First Aid Kit, N95 Mask, A set of spare clothing. Items that are required but can be substituted are: Torchlight, A bottle of Water, Whistle, Dry food (For example Phone as flashlight). words/items that aligned with the definition also count.`;
@@ -112,7 +182,12 @@ const callGemini = async (fullPrompt, currentApiKey) => {
                     parts: [{
                         text: fullPrompt
                     }]
-                }]
+                }],
+                generationConfig: {
+                    temperature: 0.7,
+                    topP: 0.95,
+                    topK: 64
+                }
             })
         });
 
@@ -193,7 +268,7 @@ const createScreen = (id, isActive, title, desc, children = []) => {
 };
 
 // Helper to create grid slots
-const createGrid = (items, limit, categorizedItems = null) => {
+const createGrid = (items, limit, categorizedItems = null, currentSituation = null) => {
     const grid = document.createElement('div');
     grid.className = 'items-grid';
 
@@ -216,6 +291,14 @@ const createGrid = (items, limit, categorizedItems = null) => {
                     if (match.status === 'correct') slot.classList.add('status-correct');
                     else if (match.status === 'okay') slot.classList.add('status-okay');
                     else if (match.status === 'wrong') slot.classList.add('status-wrong');
+                }
+
+                // Second pass: Override to green if item is in the required lists
+                // This ensures items that MUST be correct are green regardless of AI response
+                if (shouldBeGreen(itemText, currentSituation)) {
+                    // Remove any existing status classes and force correct (green)
+                    slot.classList.remove('status-okay', 'status-wrong');
+                    slot.classList.add('status-correct');
                 }
             }
         }
@@ -1273,6 +1356,14 @@ const EvaluateScreen = (state, dispatch) => {
                         else if (match.status === 'okay') slot.classList.add('status-okay');
                         else if (match.status === 'wrong') slot.classList.add('status-wrong');
                     }
+                }
+
+                // Second pass: Override to green if item is in the required lists
+                // This ensures items that MUST be correct are green regardless of AI response
+                if (shouldBeGreen(itemText, state.currentSituation)) {
+                    // Remove any existing status classes and force correct (green)
+                    slot.classList.remove('status-okay', 'status-wrong');
+                    slot.classList.add('status-correct');
                 }
             }
             // Empty slots keep base styling
