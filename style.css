@@ -138,6 +138,7 @@ body {
 
     transform: rotate(45deg);
     image-rendering: pixelated;
+    background-size: cover;
     opacity: 1;
     /* VALIDATED: Visible */
     pointer-events: none;
@@ -443,9 +444,11 @@ button:hover {
 }
 
 .character-face {
-    width: 108px;
-    height: 80px;
+    width: 120px;
+    height: 120px;
+    object-fit: contain;
     align-self: flex-start;
+    image-rendering: pixelated;
 }
 
 .feedback-message {
@@ -872,10 +875,11 @@ button:hover {
 }
 
 .selection-textbox .bravo-head {
-    width: 108px;
-    height: 80px;
+    width: 160px;
+    height: 160px;
     flex-shrink: 0;
     object-fit: contain;
+    image-rendering: pixelated;
 }
 
 .selection-card {
@@ -981,11 +985,13 @@ button:hover {
 .bravo-thankyou-img {
     position: absolute;
     bottom: -50px;
-    left: -100px;
+    left: -75px;
     /* Adjust based on look */
-    width: 300px;
+    width: 400px;
     /* Adjust size */
     height: auto;
+    image-rendering: pixelated;
+    transform: scaleX(-1);
 }
 
 .evaluate-layout {

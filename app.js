@@ -473,7 +473,7 @@ const DemoScreen = (state, dispatch) => {
 
     // Character face image (inside the box)
     const faceImg = document.createElement('img');
-    faceImg.src = 'images/Bravo/bravo-face.svg';
+    faceImg.src = 'images/Bravo/bravo_talking head.png';
     faceImg.alt = 'Bravo the Red Panda';
     faceImg.className = 'character-face';
 
@@ -855,7 +855,7 @@ const SelectionScreen = (state, dispatch) => {
     instructionBox.className = 'selection-textbox';
 
     const bravoHead = document.createElement('img');
-    bravoHead.src = 'images/Bravo/bravo-face.svg';
+    bravoHead.src = 'images/Bravo/bravo_talking head.png';
     bravoHead.alt = 'Bravo the Red Panda';
     bravoHead.className = 'bravo-head';
 
@@ -925,7 +925,7 @@ const FeedbackScreen = (state, dispatch) => {
 
     // Character face image (inside the box)
     const face = document.createElement('img');
-    face.src = 'images/Bravo/bravo-face.svg';
+    face.src = 'images/Bravo/bravo_talking head.png';
     face.alt = 'Bravo the Red Panda';
     face.className = 'character-face';
 
@@ -1311,7 +1311,7 @@ const EvaluateScreen = (state, dispatch) => {
     commentBox.className = 'eval-comment-box';
 
     const bravoImg = document.createElement('img');
-    bravoImg.src = 'images/Bravo/bravo-face.svg';
+    bravoImg.src = 'images/Bravo/bravo_talking head.png';
     bravoImg.alt = 'Bravo the Red Panda';
     bravoImg.className = 'scenario-box-image';
 
