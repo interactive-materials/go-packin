@@ -1802,7 +1802,7 @@ const App = (rootId) => {
         const text = document.createElement('p');
         text.className = 'thankyou-text';
         text.innerHTML = `
-        Developed by the Interaction Materials Lab<br>
+        Developed by the Interactive Materials Lab<br>
         at the National University of Singapore<br>
         in collaboration with<br>
         Red Cross Singapore Youth<br><br>
