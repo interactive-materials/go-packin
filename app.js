@@ -1,12 +1,12 @@
 /**
- * Functional implementation of the Scanner App with Gemini API
+ * Functional implementation of the Scanner App with OpenAI or Gemini
  */
 //
 // --- Configuration ---
 // --- Configuration ---
 // API Key is now in state.config
 // const API_KEY = '...'; // Removed
-// const API_URL = variable inside callGemini
+// Provider selects callOpenAI or callGemini
 
 // =============================================================================
 // REQUIRED ITEMS LISTS - Items that MUST be marked green if present in the bag
@@ -88,7 +88,7 @@ If the player has included items that do not represent the listed items required
 A 100 point score would be a GO bag that has all the non-negotiables and required items (or very close substitutes) and any other items which are required for the individual.
 oss evaluator in a game, and the goal is to evaluate the items in a emergency bag. Rate from 1 to 100 how apporiate the items are for a GO emergency bag and give ONE description 1 line for the entire list of items in the bag. Required non-negotiable items that should be found in the GO bag include: First Aid Kit, N95 Mask, A set of spare clothing. Items that are required but can be substituted are: Torchlight, A bottle of Water, Whistle, Dry food (For example Phone as flashlight). words/items that aligned with the definition also count.`;
 const essentialCriteria = 'When evaluating the rating give a 0 if nothing or "No Item Scanned" is packed in the bag and point out essential items that are missing. Be harsher with the rating and give below 50 if there are missing essential items however reward it greater if the items are there. If essential items are included but no specific items give a score of about 60. Give penalties for completely irrelevant items but you may give some points if items and partitally subtitude the essential items. Point out what essential items are missing. If all essential and situation specific items are there you can give 100.'
-const expressionPrompt = 'When generating the description response, use the tone of a friendly mascot character. Comment on 1 good item for the GO bag. Talk about 1 bad item for the GO bag if there are any, explain why it is bad and try to make a pun about it. Be specific if you are recommending "essentials" which are be missing. If they are bad explain why they are bad and suggest what should be included and why.'
+const expressionPrompt = 'When generating the description response, use the tone of a friendly mascot character. Comment on 1 good item for the GO bag. Talk about 1 bad item for the GO bag if there are any, explain why it is bad and try to make a pun about it. If there are missing "essentials", hint at them subtly, but do not list them out. If they are bad explain why they are bad and suggest what should be included and why.'
 const promptformat = '. Return a JSON object with this structure: { "rating": "x/100", "description": "your description here", "reasoning": "your reasoning...", "items": [ { "name": "Item Name", "status": "correct" | "okay" | "wrong" } ] }. Output ONLY raw JSON. No Markdown, no code blocks. Evaluate the items if they are correct and part of the list or good suitable for such items carefully. If there are no items in the bag, do not list out any items.';
 
 //sounds
@@ -132,10 +132,15 @@ const defaultSettings = {
     showManualInput: false,
     backgroundSpeed: 20, // seconds
     backgroundOffset: 0, // initial offset
-    apiKey: ''
+    apiKey: '',
+    provider: 'openai'
 };
 
 const savedSettings = loadSettings();
+const initialConfig = { ...defaultSettings, ...(savedSettings || {}) };
+if (initialConfig.provider !== 'gemini' && initialConfig.provider !== 'openai') {
+    initialConfig.provider = 'openai';
+}
 
 const initialState = {
     currentScreen: 'start',
@@ -153,7 +158,7 @@ const initialState = {
     selectedItem: null,
     interstitialMessage: null,
     customSituations: loadCustomSituations(),
-    config: savedSettings || defaultSettings
+    config: initialConfig
 };
 
 // --- API Logic ---
@@ -166,6 +171,55 @@ const constructPrompt = (items, situationObj) => {
 
     const itemsText = items.length > 0 ? items.join(', ') : "Nothing";
     return originalPrompt + situationContext + "Additional items that are NEEDED IN THE EMERGENCY BAG for this specific situation include: " + situationModelAnswer + "|| The player has packed the following items: " + itemsText + ". ||This is the situation rationale u should take into account: " + situationRationale + ". This is the essential criteria u should take into account: " + essentialCriteria + expressionPrompt + promptformat;
+};
+
+const callOpenAI = async (fullPrompt, currentApiKey) => {
+    try {
+        if (!currentApiKey) return "Error: No API Key configured.";
+        const url = 'https://api.openai.com/v1/responses';
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${currentApiKey}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                model: 'gpt-5.6-terra',
+                input: fullPrompt,
+                max_output_tokens: 4000,
+                reasoning: { effort: 'low' }
+            })
+        });
+
+        const data = await response.json();
+        if (data.error && data.error.message) {
+            return data.error.message;
+        }
+
+        if (!response.ok) {
+            throw new Error(`API Error: ${response.statusText}`);
+        }
+
+        if (typeof data.output_text === 'string' && data.output_text.trim()) {
+            return data.output_text.trim();
+        }
+        if (Array.isArray(data.output)) {
+            const content = data.output
+                .flatMap(output => output.content || [])
+                .map(part => part.text || '')
+                .join('')
+                .trim();
+            if (content) return content;
+        }
+        if (typeof data.text === 'string' && data.text.trim()) {
+            return data.text.trim();
+        }
+
+        throw new Error('OpenAI API returned no response text.');
+    } catch (error) {
+        console.error('OpenAI API failed:', error);
+        return "Error: Could not evaluate items. Please try again.";
+    }
 };
 
 const callGemini = async (fullPrompt, currentApiKey) => {
@@ -561,6 +615,7 @@ const SettingsScreen = (state, dispatch) => {
     cachedInfo.innerHTML = `
         <strong>Current Config:</strong><br>
         Mode: ${state.config.randomizeOrChoose ? 'Randomize' : 'Choose'}<br>
+        Provider: ${state.config.provider === 'gemini' ? 'Gemini' : 'OpenAI'}<br>
         Timer: ${state.config.timer}s<br>
         Limit: ${state.config.itemLimit}<br>
         <hr style="margin: 8px 0; border: 0; border-top: 1px solid #ccc;">
@@ -600,6 +655,30 @@ const SettingsScreen = (state, dispatch) => {
     keyContainer.style.padding = '15px';
     keyContainer.style.borderRadius = '8px';
 
+    const providerLabel = document.createElement('label');
+    providerLabel.textContent = 'Model provider: ';
+    providerLabel.style.display = 'block';
+    providerLabel.style.fontWeight = 'bold';
+    providerLabel.style.marginBottom = '5px';
+
+    const providerSelect = document.createElement('select');
+    providerSelect.id = 'settings-provider-select';
+    providerSelect.style.width = '100%';
+    providerSelect.style.marginBottom = '15px';
+    [
+        ['openai', 'OpenAI'],
+        ['gemini', 'Gemini']
+    ].forEach(([value, label]) => {
+        const option = document.createElement('option');
+        option.value = value;
+        option.textContent = label;
+        providerSelect.appendChild(option);
+    });
+    providerSelect.value = state.config.provider === 'gemini' ? 'gemini' : 'openai';
+    providerSelect.addEventListener('change', (e) =>
+        dispatch({ type: 'UPDATE_PROVIDER', payload: e.target.value })
+    );
+
     const keyLabel = document.createElement('label');
     keyLabel.textContent = 'Update API Key: ';
     keyLabel.style.display = 'block';
@@ -609,7 +688,9 @@ const SettingsScreen = (state, dispatch) => {
     const apiInput = document.createElement('input');
     apiInput.type = 'password';
     apiInput.id = 'api-key-input';
-    apiInput.placeholder = 'Paste new API Key here...';
+    apiInput.placeholder = state.config.provider === 'gemini'
+        ? 'Paste new Gemini API Key here...'
+        : 'Paste new OpenAI API Key here...';
     apiInput.style.marginBottom = '10px';
     // Do NOT set value to state.config.apiKey to keep it hidden/secure
 
@@ -626,6 +707,8 @@ const SettingsScreen = (state, dispatch) => {
     updateKeyBtn.style.width = '100%';
     updateKeyBtn.style.backgroundColor = '#0ea5e9';
 
+    keyContainer.appendChild(providerLabel);
+    keyContainer.appendChild(providerSelect);
     keyContainer.appendChild(keyLabel);
     keyContainer.appendChild(apiInput);
     keyContainer.appendChild(updateKeyBtn);
@@ -1559,6 +1642,14 @@ const App = (rootId) => {
                     ...state,
                     config: { ...state.config, apiKey: action.payload }
                 };
+            case 'UPDATE_PROVIDER':
+                return {
+                    ...state,
+                    config: {
+                        ...state.config,
+                        provider: action.payload === 'gemini' ? 'gemini' : 'openai'
+                    }
+                };
             case 'TOGGLE_MANUAL_INPUT':
                 return {
                     ...state,
@@ -1600,7 +1691,8 @@ const App = (rootId) => {
             if (state.config.showDebug) {
                 console.log("DEBUG PROMPT:", prompt);
             }
-            const result = await callGemini(prompt, state.config.apiKey);
+            const evaluate = state.config.provider === 'gemini' ? callGemini : callOpenAI;
+            const result = await evaluate(prompt, state.config.apiKey);
             if (state.config.showDebug) {
                 console.log("DEBUG RESPONSE:", result);
             }
